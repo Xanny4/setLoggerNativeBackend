@@ -25,7 +25,7 @@ module.exports = {
             const totalPages = Math.ceil(totalDocuments / pageSize);
 
             const sets = await Set.find(query).sort(sortBy).skip(skip).limit(pageSize);
-
+            console.log(sets);
             return { sets, totalPages };
         } catch (error) {
             console.error("Error getting sets:", error);

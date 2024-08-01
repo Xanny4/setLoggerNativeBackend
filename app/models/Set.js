@@ -6,7 +6,7 @@ const setSchema = new Schema({
     exercise: { type: mongoose.Schema.Types.ObjectId, required: true },
     reps: { type: Number, required: true },
     weight: { type: Number },
-    createdAt: { type: Date, default: Date.now() }
+    createdAt: { type: Date, default: () => new Date() },
 });
 
 const Set = model('Set', setSchema);

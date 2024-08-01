@@ -12,7 +12,7 @@ module.exports = {
                     $lookup: {
                         from: "sets",
                         localField: "_id",
-                        foreignField: "exerciseId",
+                        foreignField: "exercise",
                         as: "sets"
                     }
                 },
@@ -72,6 +72,54 @@ module.exports = {
         catch (error) {
             console.log(error);
             throw new Error("Error deleting a exercise", error);
+        }
+    },
+    searchExercisesByName: async (nameQuery, page = 1, pageSize = 10) => {
+        try {
+            const skip = (page - 1) * pageSize;
+            const limit = pageSize;
+            const regex = new RegExp(nameQuery, 'i'); // 'i' makes it case-insensitive
+
+            const exercises = await Exercise.aggregate([
+                {
+                    $match: {
+                        name: regex
+                    }
+                },
+                {
+                    $lookup: {
+                        from: "sets",
+                        localField: "_id",
+                        foreignField: "exercise",
+                        as: "sets"
+                    }
+                },
+                {
+                    $project: {
+                        _id: 1,
+                        name: 1,
+                        imageURL: 1,
+                        sets: { $size: "$sets" }
+                    }
+                },
+                {
+                    $sort: { sets: -1 } // Sort by the number of sets
+                },
+                {
+                    $skip: skip
+                },
+                {
+                    $limit: limit
+                }
+            ]);
+
+            const totalDocuments = await Exercise.countDocuments({ name: regex });
+            const totalPages = Math.ceil(totalDocuments / pageSize);
+
+            return { exercises, totalPages };
+        } catch (error) {
+            console.error("Error searching exercises by name:", error);
+            throw error;
         }
     }
 }

@@ -53,4 +53,15 @@ module.exports = {
             res.status(500).send(err);
         }
     },
+    searchExercisesByName: async (req, res) => {
+        try {
+            const { name } = req.query;
+            const { exercises, totalPages } = await exerciseService.searchExercisesByName(name);
+            console.log(exercises);
+            res.status(200).json({ exercises, totalPages });
+        }
+        catch (err) {
+            res.status(500).send(err);
+        }
+    }
 }
